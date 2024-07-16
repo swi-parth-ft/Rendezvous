@@ -12,6 +12,7 @@
 		07C5AF282C46B6AD00B03B16 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 07C5AF272C46B6AD00B03B16 /* Assets.xcassets */; };
 		07C5AF2B2C46B6AD00B03B16 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 07C5AF2A2C46B6AD00B03B16 /* Preview Assets.xcassets */; };
 		07C5AF322C46CD4800B03B16 /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C5AF312C46CD4800B03B16 /* Location.swift */; };
+		07C5AF342C46D7E100B03B16 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C5AF332C46D7E100B03B16 /* EditView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +22,7 @@
 		07C5AF272C46B6AD00B03B16 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		07C5AF2A2C46B6AD00B03B16 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		07C5AF312C46CD4800B03B16 /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
+		07C5AF332C46D7E100B03B16 /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +58,7 @@
 				07C5AF232C46B6AC00B03B16 /* RendezvousApp.swift */,
 				07C5AF252C46B6AC00B03B16 /* ContentView.swift */,
 				07C5AF312C46CD4800B03B16 /* Location.swift */,
+				07C5AF332C46D7E100B03B16 /* EditView.swift */,
 				07C5AF272C46B6AD00B03B16 /* Assets.xcassets */,
 				07C5AF292C46B6AD00B03B16 /* Preview Content */,
 			);
@@ -142,6 +145,7 @@
 			files = (
 				07C5AF262C46B6AC00B03B16 /* ContentView.swift in Sources */,
 				07C5AF322C46CD4800B03B16 /* Location.swift in Sources */,
+				07C5AF342C46D7E100B03B16 /* EditView.swift in Sources */,
 				07C5AF242C46B6AC00B03B16 /* RendezvousApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
