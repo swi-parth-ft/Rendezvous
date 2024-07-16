@@ -12,8 +12,6 @@ import LocalAuthentication
 
 struct ContentView: View {
     
-    
-    
     let startPosition = MapCameraPosition.region(
         MKCoordinateRegion(
             center: CLLocationCoordinate2D(latitude: 56, longitude: -3), span: MKCoordinateSpan(latitudeDelta: 10, longitudeDelta: 10)
@@ -21,38 +19,37 @@ struct ContentView: View {
     )
     
     @State private var viewModel = ViewModel()
-    @State private var showSheet = false
-    
-    
-    
-    
-   
+    @State private var long: Double = 0
+    @State private var lat: Double = 0
     
     var body: some View {
-        if viewModel.isUnlocked {
+        if !viewModel.isUnlocked {
             NavigationStack {
                 MapReader { proxy in
                     Map(initialPosition: startPosition) {
-                        ForEach(viewModel.locations) { location in
-                            Annotation(location.name, coordinate: location.coordinate) {
-                                Image(systemName: "star.circle")
-                                    .resizable()
-                                    .foregroundStyle(.red)
-                                    .frame(width: 44, height: 44)
-                                    .background(.white)
-                                    .clipShape(.circle)
-                                    .onTapGesture {
-                                        viewModel.selectedPlace = location
-                                        showSheet = true
-                                    }
+                        if viewModel.isShowingFav {
+                            ForEach(viewModel.locations) { location in
+                                Annotation(location.name, coordinate: location.coordinate) {
+                                    Image(systemName: "star.circle")
+                                        .resizable()
+                                        .foregroundStyle(.red)
+                                        .frame(width: 44, height: 44)
+                                        .background(.white)
+                                        .clipShape(.circle)
+                                        .onTapGesture {
+                                            viewModel.selectedPlace = location
+                                            
+                                        }
+                                }
                             }
                         }
                     }
                     .mapStyle(viewModel.mapMode == MapMode.hybrid ? .hybrid : .standard)
                     .onTapGesture { position in
                         if let coordinate = proxy.convert(position, from: .local) {
-                            
-                            viewModel.saveLocation(at: coordinate)
+                            viewModel.isAddingplace = true
+                            long = coordinate.longitude
+                            lat = coordinate.latitude
                             print("Tapped at \(coordinate)")
                         }
                     }
@@ -62,15 +59,42 @@ struct ContentView: View {
                         }
                         
                     }
+                    .sheet(isPresented: $viewModel.isAddingplace, content: {
+                        AddPlaceView(long: long, lat: lat) { newLocation in
+                            viewModel.addLocation(location: newLocation)
+                        }
+                        .presentationDetents([.fraction(0.4), .medium, .large])
+                    })
                     .toolbar {
-                        Button(viewModel.mapMode == MapMode.hybrid ? "Standard" : "Hybrid") {
-                            if viewModel.mapMode == MapMode.hybrid {
-                                viewModel.mapMode = .normal
-                            } else {
-                                viewModel.mapMode = .hybrid
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button {
+                                withAnimation {
+                                    if viewModel.mapMode == MapMode.hybrid {
+                                        viewModel.mapMode = .normal
+                                    } else {
+                                        viewModel.mapMode = .hybrid
+                                    }
+                                }
+                            } label: {
+                                Image(systemName: viewModel.mapMode == .hybrid ? "map" : "globe")
+                                    .shadow(radius: 5)
+                            }
+                        }
+                        
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button {
+                                withAnimation {
+                                    viewModel.isShowingFav.toggle()
+                                }
+                            } label: {
+                                Image(systemName: viewModel.isShowingFav ? "star.fill" : "star")
+                                    .shadow(radius: 5)
                             }
                         }
                     }
+                    .toolbarBackground(Color.clear, for: .navigationBar)
+                    .toolbarBackground(.hidden, for: .navigationBar)
+                    
                 }
             }
         } else {
@@ -111,8 +135,9 @@ extension ContentView {
         var selectedPlace: Location?
         var isUnlocked = false
         let savePath = URL.documentsDirectory.appending(path: "SavedPlaces")
-        
+        var isShowingFav = false
         var mapMode = MapMode.normal
+        var isAddingplace = false
         
         init() {
             do {
@@ -132,11 +157,9 @@ extension ContentView {
             }
         }
         
-        func saveLocation(at point: CLLocationCoordinate2D) {
-            let newLocation = Location(id: UUID(), name: "New location", description: "", latitude: point.latitude, longitude: point.longitude)
-            locations.append(newLocation)
+        func addLocation(location: Location) {
+            locations.append(location)
             save()
-     
         }
         
         
