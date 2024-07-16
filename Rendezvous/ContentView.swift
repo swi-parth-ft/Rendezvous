@@ -23,37 +23,54 @@ struct ContentView: View {
     @State private var viewModel = ViewModel()
     @State private var showSheet = false
     
+    
+    
+    
+   
+    
     var body: some View {
         if viewModel.isUnlocked {
-            MapReader { proxy in
-                Map(initialPosition: startPosition) {
-                    ForEach(viewModel.locations) { location in
-                        Annotation(location.name, coordinate: location.coordinate) {
-                            Image(systemName: "star.circle")
-                                .resizable()
-                                .foregroundStyle(.red)
-                                .frame(width: 44, height: 44)
-                                .background(.white)
-                                .clipShape(.circle)
-                                .onTapGesture {
-                                    viewModel.selectedPlace = location
-                                    showSheet = true
-                                }
+            NavigationStack {
+                MapReader { proxy in
+                    Map(initialPosition: startPosition) {
+                        ForEach(viewModel.locations) { location in
+                            Annotation(location.name, coordinate: location.coordinate) {
+                                Image(systemName: "star.circle")
+                                    .resizable()
+                                    .foregroundStyle(.red)
+                                    .frame(width: 44, height: 44)
+                                    .background(.white)
+                                    .clipShape(.circle)
+                                    .onTapGesture {
+                                        viewModel.selectedPlace = location
+                                        showSheet = true
+                                    }
+                            }
                         }
                     }
-                }
-                .onTapGesture { position in
-                    if let coordinate = proxy.convert(position, from: .local) {
+                    .mapStyle(viewModel.mapMode == MapMode.hybrid ? .hybrid : .standard)
+                    .onTapGesture { position in
+                        if let coordinate = proxy.convert(position, from: .local) {
+                            
+                            viewModel.saveLocation(at: coordinate)
+                            print("Tapped at \(coordinate)")
+                        }
+                    }
+                    .sheet(item: $viewModel.selectedPlace) { place in
+                        EditView(location: place) { newLocation in
+                            viewModel.updateLocation(location: newLocation)
+                        }
                         
-                        viewModel.saveLocation(at: coordinate)
-                        print("Tapped at \(coordinate)")
                     }
-                }
-                .sheet(item: $viewModel.selectedPlace) { place in
-                    EditView(location: place) { newLocation in
-                        viewModel.updateLocation(location: newLocation)
+                    .toolbar {
+                        Button(viewModel.mapMode == MapMode.hybrid ? "Standard" : "Hybrid") {
+                            if viewModel.mapMode == MapMode.hybrid {
+                                viewModel.mapMode = .normal
+                            } else {
+                                viewModel.mapMode = .hybrid
+                            }
+                        }
                     }
-                    
                 }
             }
         } else {
@@ -82,6 +99,10 @@ extension FileManager {
     }
 }
 
+enum MapMode {
+    case normal
+    case hybrid
+}
 
 extension ContentView {
     @Observable
@@ -90,6 +111,8 @@ extension ContentView {
         var selectedPlace: Location?
         var isUnlocked = false
         let savePath = URL.documentsDirectory.appending(path: "SavedPlaces")
+        
+        var mapMode = MapMode.normal
         
         init() {
             do {
