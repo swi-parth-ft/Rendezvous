@@ -15,34 +15,52 @@ struct ContentView: View {
     let startPosition = MapCameraPosition.region(
         MKCoordinateRegion(
             center: CLLocationCoordinate2D(latitude: 56, longitude: -3), span: MKCoordinateSpan(latitudeDelta: 10, longitudeDelta: 10)
-            )
+        )
     )
+    
+    @State private var searchText = ""
+        @State private var searchResults: [MKMapItem] = []
     
     @State private var viewModel = ViewModel()
     @State private var long: Double = 0
     @State private var lat: Double = 0
+    
+    @State private var filtered: String?
     
     var body: some View {
         if !viewModel.isUnlocked {
             NavigationStack {
                 MapReader { proxy in
                     Map(initialPosition: startPosition) {
-                        if viewModel.isShowingFav {
+                        
                             ForEach(viewModel.locations) { location in
-                                Annotation(location.name, coordinate: location.coordinate) {
-                                    Image(systemName: "star.circle")
-                                        .resizable()
-                                        .foregroundStyle(.red)
-                                        .frame(width: 44, height: 44)
-                                        .background(.white)
-                                        .clipShape(.circle)
-                                        .onTapGesture {
-                                            viewModel.selectedPlace = location
-                                            
-                                        }
+                                if location.type.rawValue == filtered {
+                                    Annotation(location.name, coordinate: location.coordinate) {
+                                        Image(systemName: location.type.rawValue)
+                                            .resizable()
+                                            .foregroundStyle(.blue)
+                                            .frame(width: 33, height: 33)
+                                            .shadow(radius: 5)
+                                            .onTapGesture {
+                                                viewModel.selectedPlace = location
+                                                
+                                            }
+                                    }
+                                } else if viewModel.isShowingFav {
+                                    Annotation(location.name, coordinate: location.coordinate) {
+                                        Image(systemName: location.type.rawValue)
+                                            .resizable()
+                                            .foregroundStyle(.blue)
+                                            .frame(width: 33, height: 33)
+                                            .shadow(radius: 5)
+                                            .onTapGesture {
+                                                viewModel.selectedPlace = location
+                                                
+                                            }
+                                    }
                                 }
                             }
-                        }
+                        
                     }
                     .mapStyle(viewModel.mapMode == MapMode.hybrid ? .hybrid : .standard)
                     .onTapGesture { position in
@@ -82,13 +100,19 @@ struct ContentView: View {
                         }
                         
                         ToolbarItem(placement: .navigationBarTrailing) {
-                            Button {
-                                withAnimation {
+                            Menu {
+                                Button(viewModel.isShowingFav ? "Hide All" : "Show All", systemImage: "heart") {
                                     viewModel.isShowingFav.toggle()
+                                    filtered = ""
+                                }
+                                ForEach(Cat.allCases) { cat in
+                                    Button(cat == .food ? "Food" : cat.rawValue) {
+                                        viewModel.isShowingFav = false
+                                        filtered = cat.rawValue
+                                    }
                                 }
                             } label: {
-                                Image(systemName: viewModel.isShowingFav ? "star.fill" : "star")
-                                    .shadow(radius: 5)
+                                Label("Pick Location", systemImage: "map")
                             }
                         }
                     }
@@ -160,6 +184,7 @@ extension ContentView {
         func addLocation(location: Location) {
             locations.append(location)
             save()
+            isShowingFav = true
         }
         
         
