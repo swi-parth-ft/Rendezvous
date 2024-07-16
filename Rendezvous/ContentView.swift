@@ -6,29 +6,40 @@
 //
 
 import SwiftUI
-struct User: Identifiable, Comparable {
-    let id = UUID()
-    var firstName: String
-    var lastName: String
-    
-    static func <(lhs: User, rhs: User) -> Bool {
-        lhs.lastName < rhs.lastName
-    }
-}
+
 struct ContentView: View {
-    let users = [
-            User(firstName: "Arnold", lastName: "Rimmer"),
-            User(firstName: "Kristine", lastName: "Kochanski"),
-            User(firstName: "David", lastName: "Lister"),
-    ].sorted()
+   
     
     var body: some View {
-        List(users) { user in
-                    Text("\(user.lastName), \(user.firstName)")
-                }
+        Button("Save") {
+            let data = Data("Text Message".utf8)
+            
+            do {
+                try FileManager.default.save(data, to: "message.txt")
+                let loadedData = try FileManager.default.load("message.txt")
+                
+                print(String(data: loadedData, encoding: .utf8) ?? "")
+                
+            } catch {
+                print(error.localizedDescription)
+            }
+        }
     }
 }
 
+extension FileManager {
+    
+    
+    func save(_ data: Data, to fileName: String) throws {
+        let url = URL.documentsDirectory.appending(path: fileName)
+        try data.write(to: url, options: [.atomic, .completeFileProtection])
+    }
+    
+    func load(_ fileName: String) throws -> Data {
+        let url = URL.documentsDirectory.appending(path: fileName)
+        return try Data(contentsOf: url)
+    }
+}
 #Preview {
     ContentView()
 }
