@@ -13,15 +13,29 @@ import LocalAuthentication
 struct ContentView: View {
     
     @State private var isUnlocked = false
+    let startPosition = MapCameraPosition.region(
+        MKCoordinateRegion(
+            center: CLLocationCoordinate2D(latitude: 56, longitude: -3), span: MKCoordinateSpan(latitudeDelta: 10, longitudeDelta: 10)
+            )
+    )
+    
+    @State private var locations = [Location]()
+    
     var body: some View {
-        VStack {
-            if isUnlocked {
-                Text("Unlocked")
-            } else {
-                Text("Locked")
+        MapReader { proxy in
+            Map(initialPosition: startPosition){
+                ForEach(locations) { location in
+                    Marker(location.name, coordinate: CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude))
+                }
             }
+            .onTapGesture { position in
+                    if let coordinate = proxy.convert(position, from: .local) {
+                        let newLocation = Location(id: UUID(), name: "New Location", description: "", latitude: coordinate.latitude, longitude: coordinate.latitude)
+                        locations.append(newLocation)
+                    }
+                    
+                }
         }
-        .onAppear(perform: authenticate)
     }
     
     func authenticate() {
