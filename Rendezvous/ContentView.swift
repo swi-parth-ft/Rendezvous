@@ -12,14 +12,12 @@ import LocalAuthentication
 
 struct ContentView: View {
     
-    let startPosition = MapCameraPosition.region(
-        MKCoordinateRegion(
-            center: CLLocationCoordinate2D(latitude: 56, longitude: -3), span: MKCoordinateSpan(latitudeDelta: 10, longitudeDelta: 10)
+    @State private var startPosition: MapCameraPosition = MapCameraPosition.region(
+            MKCoordinateRegion(
+                center: CLLocationCoordinate2D(latitude: 56, longitude: -3),
+                span: MKCoordinateSpan(latitudeDelta: 10, longitudeDelta: 10)
+            )
         )
-    )
-    
-    @State private var searchText = ""
-        @State private var searchResults: [MKMapItem] = []
     
     @State private var viewModel = ViewModel()
     @State private var long: Double = 0
@@ -27,23 +25,29 @@ struct ContentView: View {
     
     @State private var filtered: String?
     
+    
+    @StateObject private var locationManager = LocationManager()
+    @State private var mapRegion: MKCoordinateRegion? = nil
+    
     var body: some View {
         if !viewModel.isUnlocked {
             NavigationStack {
-                MapReader { proxy in
-                    Map(initialPosition: startPosition) {
-                        
+                ZStack {
+                    MapReader { proxy in
+                        Map(initialPosition: startPosition) {
                             ForEach(viewModel.locations) { location in
                                 if location.type.rawValue == filtered {
                                     Annotation(location.name, coordinate: location.coordinate) {
                                         Image(systemName: location.type.rawValue)
                                             .resizable()
                                             .foregroundStyle(.blue)
-                                            .frame(width: 33, height: 33)
+                                            .frame(width: 22, height: 22)
                                             .shadow(radius: 5)
+                                            .padding()
+                                            .background(.white)
+                                            .clipShape(.circle)
                                             .onTapGesture {
                                                 viewModel.selectedPlace = location
-                                                
                                             }
                                     }
                                 } else if viewModel.isShowingFav {
@@ -51,8 +55,11 @@ struct ContentView: View {
                                         Image(systemName: location.type.rawValue)
                                             .resizable()
                                             .foregroundStyle(.blue)
-                                            .frame(width: 33, height: 33)
+                                            .frame(width: 22, height: 22)
                                             .shadow(radius: 5)
+                                            .padding()
+                                            .background(.white)
+                                            .clipShape(.circle)
                                             .onTapGesture {
                                                 viewModel.selectedPlace = location
                                                 
@@ -60,65 +67,93 @@ struct ContentView: View {
                                     }
                                 }
                             }
-                        
-                    }
-                    .mapStyle(viewModel.mapMode == MapMode.hybrid ? .hybrid : .standard)
-                    .onTapGesture { position in
-                        if let coordinate = proxy.convert(position, from: .local) {
-                            viewModel.isAddingplace = true
-                            long = coordinate.longitude
-                            lat = coordinate.latitude
-                            print("Tapped at \(coordinate)")
+                           
                         }
-                    }
-                    .sheet(item: $viewModel.selectedPlace) { place in
-                        EditView(location: place) { newLocation in
-                            viewModel.updateLocation(location: newLocation)
-                        }
-                        
-                    }
-                    .sheet(isPresented: $viewModel.isAddingplace, content: {
-                        AddPlaceView(long: long, lat: lat) { newLocation in
-                            viewModel.addLocation(location: newLocation)
-                        }
-                        .presentationDetents([.fraction(0.4), .medium, .large])
-                    })
-                    .toolbar {
-                        ToolbarItem(placement: .navigationBarLeading) {
-                            Button {
-                                withAnimation {
-                                    if viewModel.mapMode == MapMode.hybrid {
-                                        viewModel.mapMode = .normal
-                                    } else {
-                                        viewModel.mapMode = .hybrid
-                                    }
-                                }
-                            } label: {
-                                Image(systemName: viewModel.mapMode == .hybrid ? "map" : "globe")
-                                    .shadow(radius: 5)
+                        .id(UUID())
+                        .mapStyle(viewModel.mapMode == MapMode.hybrid ? .hybrid : .standard)
+                        .onTapGesture { position in
+                            if let coordinate = proxy.convert(position, from: .local) {
+                                viewModel.isAddingplace = true
+                                long = coordinate.longitude
+                                lat = coordinate.latitude
+                                print("Tapped at \(coordinate)")
                             }
                         }
-                        
-                        ToolbarItem(placement: .navigationBarTrailing) {
-                            Menu {
-                                Button(viewModel.isShowingFav ? "Hide All" : "Show All", systemImage: "heart") {
-                                    viewModel.isShowingFav.toggle()
-                                    filtered = ""
-                                }
-                                ForEach(Cat.allCases) { cat in
-                                    Button(cat == .food ? "Food" : cat.rawValue) {
-                                        viewModel.isShowingFav = false
-                                        filtered = cat.rawValue
+                        .sheet(item: $viewModel.selectedPlace) { place in
+                            EditView(location: place) { newLocation in
+                                viewModel.updateLocation(location: newLocation)
+                            }
+                            
+                        }
+                        .sheet(isPresented: $viewModel.isAddingplace, content: {
+                            AddPlaceView(long: long, lat: lat) { newLocation in
+                                viewModel.addLocation(location: newLocation)
+                            }
+                            .presentationDetents([.fraction(0.4), .medium, .large])
+                        })
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarLeading) {
+                                Button {
+                                    withAnimation {
+                                        if viewModel.mapMode == MapMode.hybrid {
+                                            viewModel.mapMode = .normal
+                                        } else {
+                                            viewModel.mapMode = .hybrid
+                                        }
                                     }
+                                } label: {
+                                    Image(systemName: viewModel.mapMode == .hybrid ? "map" : "globe")
+                                        .shadow(radius: 5)
                                 }
-                            } label: {
-                                Label("Pick Location", systemImage: "map")
+                            }
+                            
+                            ToolbarItem(placement: .navigationBarTrailing) {
+                                Menu {
+                                    Button(viewModel.isShowingFav ? "Hide All" : "Show All", systemImage: "heart") {
+                                        viewModel.isShowingFav.toggle()
+                                        filtered = ""
+                                    }
+                                    ForEach(Cat.allCases) { cat in
+                                        Button(cat == .food ? "Food" : cat.rawValue) {
+                                            viewModel.isShowingFav = false
+                                            filtered = cat.rawValue
+                                        }
+                                    }
+                                } label: {
+                                    Label("Pick Location", systemImage: "map")
+                                }
+                            }
+                        }
+                        .toolbarBackground(Color.clear, for: .navigationBar)
+                        .toolbarBackground(.hidden, for: .navigationBar)
+                    }
+                    .onAppear {
+                        Task {
+                            if let userLocation = locationManager.userLocation {
+                                startPosition = MapCameraPosition.region(
+                                    MKCoordinateRegion(
+                                        center: userLocation,
+                                        span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
+                                    )
+                                )
+                                print(userLocation)
                             }
                         }
                     }
-                    .toolbarBackground(Color.clear, for: .navigationBar)
-                    .toolbarBackground(.hidden, for: .navigationBar)
-                    
+                    .onChange(of: locationManager.userLocation) {
+                        Task {
+                            if let newLocation = locationManager.userLocation {
+                                startPosition = MapCameraPosition.region(
+                                    MKCoordinateRegion(
+                                        center: newLocation,
+                                        span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
+                                    )
+                                )
+                                print(newLocation)
+                                print(startPosition)
+                            }
+                        }
+                    }
                 }
             }
         } else {
@@ -217,6 +252,12 @@ extension ContentView {
     
     
 }
+extension CLLocationCoordinate2D: @retroactive Equatable {
+    public static func == (lhs: CLLocationCoordinate2D, rhs: CLLocationCoordinate2D) -> Bool {
+        return lhs.latitude == rhs.latitude && lhs.longitude == rhs.longitude
+    }
+}
+
 #Preview {
     ContentView()
 }

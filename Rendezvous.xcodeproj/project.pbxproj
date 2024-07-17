@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		070231D42C46EF72001331A4 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 070231D32C46EF72001331A4 /* Result.swift */; };
 		070231D62C470DD4001331A4 /* AddPlaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 070231D52C470DD4001331A4 /* AddPlaceView.swift */; };
+		070231D82C47367A001331A4 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 070231D72C47367A001331A4 /* LocationManager.swift */; };
 		07C5AF242C46B6AC00B03B16 /* RendezvousApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C5AF232C46B6AC00B03B16 /* RendezvousApp.swift */; };
 		07C5AF262C46B6AC00B03B16 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C5AF252C46B6AC00B03B16 /* ContentView.swift */; };
 		07C5AF282C46B6AD00B03B16 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 07C5AF272C46B6AD00B03B16 /* Assets.xcassets */; };
@@ -20,6 +21,8 @@
 /* Begin PBXFileReference section */
 		070231D32C46EF72001331A4 /* Result.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
 		070231D52C470DD4001331A4 /* AddPlaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPlaceView.swift; sourceTree = "<group>"; };
+		070231D72C47367A001331A4 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		070231D92C47383C001331A4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		07C5AF202C46B6AC00B03B16 /* Rendezvous.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Rendezvous.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		07C5AF232C46B6AC00B03B16 /* RendezvousApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RendezvousApp.swift; sourceTree = "<group>"; };
 		07C5AF252C46B6AC00B03B16 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -59,6 +62,7 @@
 		07C5AF222C46B6AC00B03B16 /* Rendezvous */ = {
 			isa = PBXGroup;
 			children = (
+				070231D92C47383C001331A4 /* Info.plist */,
 				07C5AF232C46B6AC00B03B16 /* RendezvousApp.swift */,
 				07C5AF252C46B6AC00B03B16 /* ContentView.swift */,
 				070231D52C470DD4001331A4 /* AddPlaceView.swift */,
@@ -66,6 +70,7 @@
 				07C5AF312C46CD4800B03B16 /* Location.swift */,
 				07C5AF332C46D7E100B03B16 /* EditView.swift */,
 				07C5AF272C46B6AD00B03B16 /* Assets.xcassets */,
+				070231D72C47367A001331A4 /* LocationManager.swift */,
 				07C5AF292C46B6AD00B03B16 /* Preview Content */,
 			);
 			path = Rendezvous;
@@ -152,6 +157,7 @@
 				07C5AF262C46B6AC00B03B16 /* ContentView.swift in Sources */,
 				070231D42C46EF72001331A4 /* Result.swift in Sources */,
 				070231D62C470DD4001331A4 /* AddPlaceView.swift in Sources */,
+				070231D82C47367A001331A4 /* LocationManager.swift in Sources */,
 				07C5AF322C46CD4800B03B16 /* Location.swift in Sources */,
 				07C5AF342C46D7E100B03B16 /* EditView.swift in Sources */,
 				07C5AF242C46B6AC00B03B16 /* RendezvousApp.swift in Sources */,
@@ -291,7 +297,9 @@
 				DEVELOPMENT_TEAM = P5K444356C;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Rendezvous/Info.plist;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "We need to unlock your data";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need to access your location";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -321,7 +329,9 @@
 				DEVELOPMENT_TEAM = P5K444356C;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Rendezvous/Info.plist;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "We need to unlock your data";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need to access your location";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
